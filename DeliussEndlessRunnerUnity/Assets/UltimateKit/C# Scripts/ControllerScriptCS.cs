@@ -347,7 +347,7 @@ public class ControllerScriptCS : MonoBehaviour {
 			if (mecanimEnabled)//if mecanim animations are used
 			{
 				aPlayerMecAnim.SetBool("RunAnim", false);//disable run animation
-				aPlayerMecAnim.SetBool("DuckAnim", false);//disable slide animation
+				aPlayerMecAnim.SetBool("SlideAnim", false);//disable slide animation
 			}		
 			
 			fCurrentUpwardVelocity = fJumpPush;
@@ -832,14 +832,15 @@ public class ControllerScriptCS : MonoBehaviour {
 			}//end of jump queue
 			if (directionQueue == SwipeControlsCS.SwipeDirection.Duck && !bInDuck)		//queue SLIDE
 			{
-				duckPlayer();			
+				duckPlayer();
+						
 				bDirectionQueueFlag = false;
 			}//end of duck queue
 			
 		}//end of direction queue
 	
 		//restore the size of the collider after slide ends
-		if ( (mecanimEnabled && aPlayerMecAnim.GetAnimatorTransitionInfo(0).nameHash == Animator.StringToHash("Base.Slide -> Base.Run"))
+		if ( (mecanimEnabled && aPlayerMecAnim.GetAnimatorTransitionInfo(0).nameHash == Animator.StringToHash("Slide -> Run"))
 		|| (!mecanimEnabled && !isPlayingDuck() && bInDuck == true) )//is the slide animation playing?
 		{
 			hSoundManagerCS.playSound(SoundManagerCS.CharacterSounds.Footsteps);
@@ -860,8 +861,11 @@ public class ControllerScriptCS : MonoBehaviour {
 				aPlayer.CrossFadeQueued("run", 0.5f, QueueMode.CompleteOthers);
 			else
 			{
-				aPlayerMecAnim.SetBool("DuckAnim", false);
+				aPlayerMecAnim.SetBool("SlideAnim", false);
 				aPlayerMecAnim.SetBool("RunAnim", true);
+				//bInDuck = false;
+				//bDiveFlag = false;
+				print ("player ducking");
 			}
 		}//end of if end of duck animation
 	
@@ -913,6 +917,7 @@ public class ControllerScriptCS : MonoBehaviour {
 			if (direction == SwipeControlsCS.SwipeDirection.Duck && !bInAir && !bInDuck)//SLIDE: on ground
 			{
 				duckPlayer();
+					
 			}
 			if (direction == SwipeControlsCS.SwipeDirection.Duck && bInAir && !bInDuck)//SLIDE/ DIVE: in air
 			{				
@@ -969,10 +974,13 @@ public class ControllerScriptCS : MonoBehaviour {
 		else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && !bInAir && !bInDuck)
 		{
 			duckPlayer();
+			//print ("ducking player");
+			
 		}
 		else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && bInAir && !bInDuck)
 		{
 			bDiveFlag = true;	//used by Set Transform() to make the character dive
+			
 		}
 		
 	}//end of Movement Control function
@@ -993,7 +1001,9 @@ public class ControllerScriptCS : MonoBehaviour {
 		}
 		else//if mecanim are used
 		{		
-			aPlayerMecAnim.SetBool("DuckAnim", true);
+			aPlayerMecAnim.SetBool("SlideAnim", true);
+			//print ("player ducking");
+			
 			//aPlayerMecAnim.SetTrigger ("DuckTrigger");
 		}
 		
@@ -1020,7 +1030,7 @@ public class ControllerScriptCS : MonoBehaviour {
 				return false;
 		}
 		else
-			return aPlayerMecAnim.GetBool("DuckAnim");
+			return aPlayerMecAnim.GetBool("SlideAnim");
 	}
 	
 	/*
